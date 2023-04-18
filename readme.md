@@ -1,10 +1,16 @@
 # Slack ChatGPT Bot
 
-_This document was written by ChatGPT and directed by Aaron Ng ([@localghost](https://twitter.com/localghost))._
+This fork was inspired by Aaron Ng ([@localghost](https://twitter.com/localghost))._
+
+Some additions have been made such as adding Google Search and CoinGecko support via Langchain Agents. Also added support for generating images via
+StabilityAI's Dreamstudio APIs.
+
+The new additions also include Redis Caching support. I've tried using the native LLM Cache, but it isn't clear on what the TTL was. So I decided to stick with Redis.
 
 ## Introduction
 
-This script creates a Slack bot that uses ChatGPT to respond to direct messages and mentions in a Slack workspace. It functions as a general question-answering bot for your company.
+This script creates a Slack bot that uses ChatGPT to respond to direct messages and mentions in a Slack workspace. While you can add QnA, it currently includes connections
+to Google, Coingecko and DreamStudio via Langchain Agents.
 
 ## Environment Variables
 
@@ -37,6 +43,13 @@ This script creates a Slack bot that uses ChatGPT to respond to direct messages 
 
 Now your Slack bot should be ready to use!
 
+### Additional Configuration due to new additions:
+
+1. Get the Serper keys from https://serper.dev. The key should replace values in SERPER_API_KEY in the .env file.
+2. Get the Stability AI API Keys by signing up for https://beta.dreamstudio.ai/
+3. Get the Redis credentials by creating your own instance, or create one from https://upstash.com
+
+
 ## Deployment
 
 ### Cloud Deployment:
@@ -54,3 +67,9 @@ Now your Slack bot should be ready to use!
 ```
 
 Start the bot and enjoy using it in your Slack workspace.
+
+
+### Caveats:
+
+1. Agents are still somewhat unrealiable. You can probably make them better by better describing the prompts.
+2. ValueErrors still happen sometimes for LLM Outputs. This can be resolved by querying the Bot again.

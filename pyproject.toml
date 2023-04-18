@@ -1,17 +1,28 @@
 [tool.poetry]
-name = "slack-gpt"
+name = "python-template"
 version = "0.1.0"
 description = ""
-authors = ["Aaron Ng <aaron@araon.ng>"]
+authors = ["Your Name <you@example.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.9"
-slack-bolt = "^1.16.4"
-slack-sdk = "^3.20.2"
-openai = "^0.27.2"
-python-dotenv = "^1.0.0"
+python = ">=3.10.0,<3.11"
+numpy = "^1.22.2"
+replit = "^3.2.4"
+Flask = "^2.2.0"
+urllib3 = "^1.26.12"
+openai = "^0.27.4"
+slack-bolt = "^1.17.1"
+slack-sdk = "^3.21.1"
+langchain = "^0.0.142"
+pycoingecko = "^3.1.0"
+redis = "^4.5.4"
+Pillow = "^9.5.0"
+stability-sdk = "^0.5.0"
+wikipedia = "^1.4.0"
 
 [tool.poetry.dev-dependencies]
+debugpy = "^1.6.2"
+replit-python-lsp-server = {extras = ["yapf", "rope", "pyflakes"], version = "^1.5.9"}
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

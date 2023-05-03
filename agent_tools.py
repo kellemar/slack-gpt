@@ -8,7 +8,6 @@ from langchain import LLMChain, PromptTemplate
 from pycoingecko import CoinGeckoAPI
 import time
 import cache
-import image_generator
 
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import Chroma
@@ -18,7 +17,6 @@ from langchain.chat_models import ChatOpenAI
 
 import requests
 import os
-import json
 import re
 
 from bs4 import BeautifulSoup

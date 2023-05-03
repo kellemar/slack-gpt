@@ -1,8 +1,8 @@
-# Slack ChatGPT Bot
+# Slack ChatGPT Bot with Google, Coingecko Price check, and Document QnA, etc.
 
 This fork was inspired by Aaron Ng ([@localghost](https://twitter.com/localghost))._
 
-Some additions have been made such as adding Google Search and CoinGecko support via Langchain Agents. Also added support for generating images via StabilityAI's Dreamstudio APIs.
+Some additions have been made such as adding Google Search and CoinGecko support via Langchain Agents. Also added support for generating images via StabilityAI's Dreamstudio APIs. This also includes Document QnA via ChromaDB, or if you wish, Postgres PGVectors.
 
 The new additions also include Redis Caching support. I've tried using the native LLM Cache, but it isn't clear on what the TTL was. So I decided to stick with Redis, and it gives me more customisation on the TTLs of each data type.
 

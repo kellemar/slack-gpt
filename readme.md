@@ -43,10 +43,11 @@ to Google, Coingecko and DreamStudio via Langchain Agents.
 1. In "Settings" → "Socket Mode", enable both Socket Mode and Event Subscriptions.
 2. In "Settings" → "Basic Information", install your app to the workspace by following the instructions.
 3. In "Settings" → "Basic Information", scroll to "App-Level Tokens" and create one with the permission `connections:write`. Set the resulting token that starts with `xapp-` as your `SLACK_APP_TOKEN`.
-4. In "Features" → "OAuth and Permissions", copy the "Bot User OAuth Token" and set it as the `SLACK_BOT_TOKEN` in your environment.
-5. In "Features" → "OAuth and Permissions" → "Scopes", add the following permissions: `app_mentions:read`, `channels:history`, `channels:read`, `chat:write`, `chat:write.public`, `groups:history`, `groups:read`, `im:history`, `im:read`, `mpim:history`, `mpim:read`, `users:read`.
-6. In "Features" → "Event Subscriptions" → "Subscribe to Bot Events", add the following bot user events: `app_mentions:read`, `message.im`.
-7. In "Features" → "App Home", turn on the "Messages Tab" switch, and enable the `Allow users to send Slash commands and messages from the messages tab` feature.
+4. In "Features" → "OAuth and Permissions" → "Scopes", add the following permissions: `app_mentions:read`, `channels:history`, `channels:read`, `chat:write`, `chat:write.public`, `groups:history`, `groups:read`, `im:history`, `im:read`, `mpim:history`, `mpim:read`, `users:read`, `files.write`, `files.read`.
+5. In "Features" → "Event Subscriptions" → "Subscribe to Bot Events", add the following bot user events: `app_mentions:read`, `message.im`.
+6. In "Features" → "App Home", turn on the "Messages Tab" switch, and enable the `Allow users to send Slash commands and messages from the messages tab` feature.
+7. In "Features" → "OAuth and Permissions", copy the "Bot User OAuth Token" and set it as the `SLACK_BOT_TOKEN` in your environment.
+
 
 Now your Slack bot should be ready to use!
 

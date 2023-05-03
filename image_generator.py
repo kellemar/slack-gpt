@@ -3,7 +3,7 @@ import os
 import warnings
 from stability_sdk import client
 import stability_sdk.interfaces.gooseai.generation.generation_pb2 as generation
-import base64
+
 from PIL import Image
 import io
 import traceback
@@ -26,7 +26,7 @@ def get_image_from_stability(image_prompt):
     answers = stability_api.generate(
       prompt=image_prompt,
       steps=
-      40,  # Amount of inference steps performed on image generation. Defaults to 30.
+      30,  # Amount of inference steps performed on image generation. Defaults to 30.
       cfg_scale=
       7.0,  # Influences how strongly your generation is guided to match your prompt.
       # Setting this value higher increases the strength in which it tries to match your prompt.

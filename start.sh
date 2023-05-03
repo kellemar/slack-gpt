@@ -4,4 +4,4 @@ set -euxo pipefail
 
 source setup-poetry.sh
 
-poetry run python slackgpt.py
+poetry run python main.py

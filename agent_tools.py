@@ -1,12 +1,7 @@
 # Agent setup
 from langchain.agents import tool
 from langchain.utilities import GoogleSerperAPIWrapper
-from langchain.prompts.chat import (
-  ChatPromptTemplate,
-  SystemMessagePromptTemplate,
-  AIMessagePromptTemplate,
-  HumanMessagePromptTemplate,
-)
+
 from langchain.chat_models import ChatOpenAI
 from langchain import LLMChain, PromptTemplate
 # Coingecko Linkup
@@ -15,50 +10,95 @@ import time
 import cache
 import image_generator
 
+from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.vectorstores import Chroma
+from langchain.chains import RetrievalQAWithSourcesChain
+
+from langchain.chat_models import ChatOpenAI
+
+import requests
+import os
+import json
+import re
+
+from bs4 import BeautifulSoup
+
+
+def remove_script_tags(text):
+  pattern = r'<script[^>]*>.*?</script>'
+  clean_text = re.sub(pattern, '', text, flags=re.IGNORECASE | re.DOTALL)
+  return clean_text
+
 
 # Agent Tools
-# Stability AI Image Generation Functions
-@tool("generate_image", return_direct=True)
-def generate_image(input):
-  """Useful for when an image is specifically asked to be generated or created from Stability AI's platform. The input is the image that the user is describing. """
-  result = {}
-  result['output'] = ""
-  result['image_generated'] = ""
-  system_prompt = "Stable Diffusion is an AI art generation model similar to DALLE-2. \
-Below is a list of prompts that can be used to generate images with Stable Diffusion:\
-- portait of a homer simpson archer shooting arrow at forest monster, front game card, drark, marvel comics, dark, intricate, highly detailed, smooth, artstation, digital illustration by ruan jia and mandy jurgens and artgerm and wayne barlowe and greg rutkowski and zdislav beksinski \
-- pirate, concept art, deep focus, fantasy, intricate, highly detailed, digital painting, artstation, matte, sharp focus, illustration, art by magali villeneuve, chippy, ryan yee, rk post, clint cearley, daniel ljunggren, zoltan boros, gabor szikszai, howard lyon, steve argyle, winona nelson \
-- ghost inside a hunted room, art by lois van baarle and loish and ross tran and rossdraws and sam yang and samdoesarts and artgerm, digital art, highly detailed, intricate, sharp focus, Trending on Artstation HQ, deviantart, unreal engine 5, 4K UHD image \
-- red dead redemption 2, cinematic view, epic sky, detailed, concept art, low angle, high detail, warm lighting, volumetric, godrays, vivid, beautiful, trending on artstation, by jordan grimmer, huge scene, grass, art greg rutkowski \
-- a fantasy style portrait painting of rachel lane / alison brie hybrid in the style of francois boucher oil painting unreal 5 daz. rpg portrait, extremely detailed artgerm greg rutkowski alphonse mucha greg hildebrandt tim hildebrandt\
-- athena, greek goddess, claudia black, art by artgerm and greg rutkowski and magali villeneuve, bronze greek armor, owl crown, d & d, fantasy, intricate, portrait, highly detailed, headshot, digital painting, trending on artstation, concept art, sharp focus, illustration \
-- closeup portrait shot of a large strong female biomechanic woman in a scenic scifi environment, intricate, elegant, highly detailed, centered, digital painting, artstation, concept art, smooth, sharp focus, warframe, illustration, thomas kinkade, tomasz alen kopera, peter mohrbacher, donato giancola, leyendecker, boris vallejo \
-- ultra realistic illustration of steve urkle as the hulk, intricate, elegant, highly detailed, digital painting, artstation, concept art, smooth, sharp focus, illustration, art by artgerm and greg rutkowski and alphonse mucha \
-I want you to write me a single detailed prompt exactly about the idea written after IDEA. Follow the structure of the example prompts. This means a very short description of the scene, followed by modifiers divided by commas to alter the mood, style, lighting, and more. \
-IDEA: {input} \n Prompt: "
-
-  prompt = PromptTemplate(template=system_prompt, input_variables=["input"])
-  llm_chain = LLMChain(prompt=prompt,
-                       llm=ChatOpenAI(temperature=0.7),
-                       verbose=True)
-  response = llm_chain.predict(input=input)
-  print(response)
-  new_prompt = response.split("Prompt:")[-1]
-  result = image_generator.get_image_from_stability(new_prompt)
-  return result
-
-
 @tool("code_snippets", return_direct=True)
 def code_snippets(query: str) -> str:
   """Useful for generating code snippets. The input should be the query in natural language."""
   template = """Q:{question}"""
   prompt = PromptTemplate(template=template, input_variables=["question"])
+  
+  # Use GPT-4 since it's superior to GPT3.5 in terms of code completion.
   llm_chain = LLMChain(prompt=prompt,
-                       llm=ChatOpenAI(temperature=0.7),
+                       llm=ChatOpenAI(model_name="gpt-4",
+                                      temperature=0.7,
+                                      max_tokens=8000),
                        verbose=True)
 
   response = llm_chain.predict(question=query)
   return response
+
+
+@tool("company_knowledge", return_direct=False)
+def company_knowledge(query: str) -> str:
+  """Useful when questions are asked about Company Name. Use this more than Google Search. The input should be a question in natural language that this API can answer."""
+  cached_key = query.lower().replace(" ", "_")
+  cached = cache.get_cache(cached_key)
+  if cached:
+    #print(cached_video)
+    return cached
+  embeddings = OpenAIEmbeddings()
+  persist_directory = 'db'
+  vectorstore = Chroma(persist_directory=persist_directory,
+                           embedding_function=embeddings,
+                           collection_name="company_name")
+
+  db_retrieval_chain = RetrievalQAWithSourcesChain.from_chain_type(
+    llm=ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0, max_tokens=1000),
+    chain_type="stuff",
+    retriever=vectorstore.as_retriever(search_kwargs={"k": 4}))
+  response = db_retrieval_chain(query)
+  cache.set_cache(cached_key, response)
+  print(response)
+  return response
+
+# TODO: Largely untested and not finished. Some issues with scraping certain sites.
+@tool("scrape_website", return_direct=False)
+def scrape_website(query: str) -> str:
+  """Useful for accessing the contents of a website. The input should be the url of the website."""
+  st = time.time()
+  browserless_url = "https://chrome.browserless.io/content?token=" + os.environ.get(
+    "BROWSERLESS_TOKEN")
+  result = requests.post(url=browserless_url,
+                         json={
+                           "gotoOptions": {
+                             "timeout": 10000,
+                             "waitUntil": "networkidle4"
+                           },
+                           "url": query,
+                           "elements": [{
+                             "selector": "body"
+                           }]
+                         },
+                         headers={"Content-Type": "application/json"})
+  try:
+    json_result = result
+    cleaned_json = remove_script_tags(json_result)
+    soup = BeautifulSoup(cleaned_json, 'html.parser')
+    inner_text = soup.get_text()
+    print("End of scrape_website: " + str(time.time() - st) + " seconds")
+  except Exception as e:
+    inner_text = "Unable to process website."
+  return inner_text
 
 
 @tool("web3_token_price", return_direct=False)
@@ -86,9 +126,6 @@ def get_token_price(token_name: str) -> str:
     token_symbol = token_name
     cg = CoinGeckoAPI()
 
-    # Check for AVG. Because AVG pulls up SAVG instead, specify the AvocadoDAO coin directly
-    if token_symbol.lower() == "avg":
-      token_symbol = "avocado dao"
     token_data = cg.search(token_symbol.lower())
     if token_data:
       # print("Token Data: " + str(token_data))

@@ -19,6 +19,14 @@ to Google, Coingecko and DreamStudio via Langchain Agents.
 1. `OPENAI_API_KEY`: Your OpenAI API key, which starts with "sk-".
 2. `SLACK_APP_TOKEN`: Your Slack App Token, which starts with "xapp-".
 3. `SLACK_BOT_TOKEN`: Your Slack Bot Token, which starts with "xoxb-".
+4. `SERPER_API_KEY`: Your key to access google serper API on Langchain. Get it from serper.dev 
+5. `REDIS_PASSWORD`: Redis cache password
+6. `REDIS_URL`: URL to your Redis server
+7. `STABILITY_KEY`: Stability AI key from Dreamstudio.ai
+8. `STABILITY_HOST`: Host to use Stability AI's image generation servers
+9. `PGVECTOR_CONNECTION_STRING`:"postgresql+psycopg2://username:password@db_url:5432/db_name"
+
+
 
 ### Optional:
 
@@ -70,6 +78,5 @@ Start the bot and enjoy using it in your Slack workspace.
 
 
 ### Caveats:
-
 1. Agents are still somewhat unrealiable. You can probably make them better by better describing the prompts.
-2. ValueErrors still happen sometimes for LLM Outputs. This can be resolved by querying the Bot again.
+2. ValueErrors still happen sometimes for LLM Outputs. This can be resolved by querying the Bot again and catch via exception handling.

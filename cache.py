@@ -1,11 +1,9 @@
 import os
 # Set up in-memory cache
 import redis
-import langchain
-from langchain.cache import InMemoryCache
-#langchain.llm_cache = InMemoryCache()
 
-# Set up Redis Cache
+# Set up Redis Cache with Upstash. You can create an account
+# at https://console.upstash.com
 # Initialize Redis
 r = redis.Redis(host=os.environ["REDIS_URL"],
                 port='40130',

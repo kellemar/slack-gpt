@@ -2,10 +2,9 @@
 
 This fork was inspired by Aaron Ng ([@localghost](https://twitter.com/localghost))._
 
-Some additions have been made such as adding Google Search and CoinGecko support via Langchain Agents. Also added support for generating images via
-StabilityAI's Dreamstudio APIs.
+Some additions have been made such as adding Google Search and CoinGecko support via Langchain Agents. Also added support for generating images via StabilityAI's Dreamstudio APIs.
 
-The new additions also include Redis Caching support. I've tried using the native LLM Cache, but it isn't clear on what the TTL was. So I decided to stick with Redis.
+The new additions also include Redis Caching support. I've tried using the native LLM Cache, but it isn't clear on what the TTL was. So I decided to stick with Redis, and it gives me more customisation on the TTLs of each data type.
 
 ## Introduction
 
@@ -76,6 +75,16 @@ Now your Slack bot should be ready to use!
 
 Start the bot and enjoy using it in your Slack workspace.
 
+### Ingesting Data:
+
+There are 2 files that you can use to ingest the data needed.
+ingest_chroma.py - Adds your data into a local ChromaDB and creates a /db/ folder which stores the indexes.
+
+OR
+
+ingest_pg.py - Adds your data into a Supabase Postgres PGVector-supported table. 
+
+If you are using PGVectors, you will have update the vectorstore code in both main.py and agent_tools.py to support it.
 
 ### Caveats:
 1. Agents are still somewhat unrealiable. You can probably make them better by better describing the prompts.
